@@ -2,7 +2,7 @@
 
 ε-δ論法を図で確かめる授業用ページ（iPad・スマートフォンでホーム画面に追加するとアプリとして使え、一度開けばオフラインでも動きます）。
 
-- 公開ページ: https://tkys601-lab.github.io/epsilon-delta/
+- 公開ページ: https://tkys601-lab.github.io/epsilon-delta-/
 - iPad: Safari で開く → 共有 → 「ホーム画面に追加」
 
 内容を変えたら `sw.js` の `CACHE` の番号を上げる（端末のキャッシュが入れ替わる）。
