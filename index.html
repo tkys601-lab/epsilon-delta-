@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2C4A8C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ε-δ論法">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}</style>
+<title>ε-δ論法のしくみ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Shippori+Mincho:wght@600;700&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap">
+<style>
+/* 1 段組の配布資料: 本文 70ch, 図だけ少し広く。ε = 緑, δ = 紫 をページ全体で統一 */
+:root{
+  --bg:#F7F8FA; --paper:#FFFFFF; --ink:#1E2433; --muted:#5B6275; --rule:#DDE1E8;
+  --accent:#2C4A8C; --eps:#12806A; --eps-bg:#E2F3EE; --del:#5A4FC0; --del-bg:#ECEBFB;
+  --ok:#1C7A43; --ok-bg:#E3F3E8; --ng:#B3342F; --ng-bg:#FBE8E7;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  --f-disp:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-math:"STIX Two Text","Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12151C; --paper:#1A1E27; --ink:#E6E8EE; --muted:#A1A8B8; --rule:#2E3442;
+  --accent:#8FA9E6; --eps:#4FC9A9; --eps-bg:#173A33; --del:#A49CF0; --del-bg:#2A2850;
+  --ok:#6BD493; --ok-bg:#183826; --ng:#F08A84; --ng-bg:#43201E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151C; --paper:#1A1E27; --ink:#E6E8EE; --muted:#A1A8B8; --rule:#2E3442;
+  --accent:#8FA9E6; --eps:#4FC9A9; --eps-bg:#173A33; --del:#A49CF0; --del-bg:#2A2850;
+  --ok:#6BD493; --ok-bg:#183826; --ng:#F08A84; --ng-bg:#43201E; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.85;padding-inline:16px;padding-block:32px 64px}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+.prose{max-width:70ch}
+h1{font-family:var(--f-disp);font-size:clamp(28px,6vw,40px);line-height:1.3;margin:0;text-wrap:balance}
+h2{font-family:var(--f-disp);font-size:24px;margin:0 0 12px;text-wrap:balance;display:flex;gap:12px;align-items:baseline}
+h2 .no{font-family:var(--f-math);color:var(--accent);font-size:20px}
+h3{font-size:17px;margin:20px 0 6px}
+p{margin:0 0 12px}
+.lead{color:var(--muted);margin-top:12px}
+.m{font-family:var(--f-math);font-style:italic;font-size:1.08em;white-space:nowrap}
+.e{color:var(--eps);font-weight:700}.d{color:var(--del);font-weight:700}
+.defbox{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:20px 22px}
+.defbox .lim{font-family:var(--f-math);font-size:22px;text-align:center;margin:4px 0 14px}
+.defbox .lim i{font-style:italic}
+.quote{border-left:3px solid var(--accent);padding:6px 0 6px 16px;font-weight:500}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+.role{border-radius:10px;padding:14px 16px}
+.role.eps{background:var(--eps-bg)}.role.del{background:var(--del-bg)}
+.role b{display:block;font-size:15px}
+.role.eps b{color:var(--eps)}.role.del b{color:var(--del)}
+.role span{font-size:14.5px}
+.fig{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:16px}
+.fig svg{display:block;width:100%;height:auto}
+.fig svg text{font-family:var(--f-math);font-size:14px;fill:var(--muted)}
+.ctl{display:grid;grid-template-columns:auto minmax(0,1fr) 3.5em;gap:8px 12px;align-items:center;margin-top:10px;font-size:15px}
+.ctl output{font-family:var(--f-math);font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+input[type=range]{width:100%}
+#eps{accent-color:var(--eps)}#del{accent-color:var(--del)}
+.row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:14px}
+button,select{font:inherit;font-size:14.5px;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:6px 14px;cursor:pointer}
+button:hover,select:hover{border-color:var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#status{font-size:14.5px;padding:8px 14px;border-radius:8px;font-weight:500;min-width:0;flex:1 1 280px}
+#status.ok{background:var(--ok-bg);color:var(--ok)}#status.ng{background:var(--ng-bg);color:var(--ng)}
+ol.steps{padding-left:1.4em;margin:0}ol.steps li{margin-bottom:8px}
+.proof{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:16px 20px;margin-top:8px}
+.proof .tag{font-size:13px;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.pit{display:grid;gap:12px}
+.pit div{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:12px 16px}
+.pit b{color:var(--ng)}
+details{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:12px 16px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:500}
+details .ans{margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule)}
+footer{color:var(--muted);font-size:13.5px;border-top:1px solid var(--rule);padding-top:12px}
+@media print{body{background:#fff;padding-block:0}main{gap:28px}.ctl,.row:has(button),#auto{display:none}section,.fig,details,.proof{break-inside:avoid}}
+@media (prefers-reduced-motion:no-preference){#curveIn{transition:stroke .2s}}
+</style>
+
+</head>
+<body>
+<main>
+<header class="prose">
+  <h1>ε-δ論法のしくみ</h1>
+  <p class="lead">「x を a に近づけると f(x) は L に近づく」を、不等式だけで正確に言い直す方法。図を動かしながら読んでください。</p>
+</header>
+
+<section class="prose">
+  <h2><span class="no">1</span>定義</h2>
+  <div class="defbox">
+    <div class="lim">lim<sub><i>x</i>→<i>a</i></sub> <i>f</i>(<i>x</i>) = <i>L</i></div>
+    <p style="margin:0">とは、<strong>どんなに小さい <span class="m e">ε</span> &gt; 0 を指定されても</strong>、<strong>ある <span class="m d">δ</span> &gt; 0 を選べば</strong>、<span class="m">0 &lt; |x − a| &lt; <span class="d">δ</span></span> を満たすすべての <span class="m">x</span> で <span class="m">|f(x) − L| &lt; <span class="e">ε</span></span> が成り立つ、ということ。</p>
+  </div>
+  <div class="roles">
+    <div class="role eps"><b>ε（イプシロン）＝ 許す誤差</b><span>f(x) が L からどれだけずれてよいか。グラフでは<strong>縦方向</strong>の幅。</span></div>
+    <div class="role del"><b>δ（デルタ）＝ 近さの目安</b><span>x を a にどこまで近づければよいか。グラフでは<strong>横方向</strong>の幅。</span></div>
+  </div>
+</section>
+
+<section class="prose">
+  <h2><span class="no">2</span>挑戦者と回答者のゲーム</h2>
+  <p>定義は、2 人のやりとりとして読むと分かりやすくなります。</p>
+  <ol class="steps">
+    <li><strong>挑戦者</strong>が「誤差を <span class="m e">ε</span> = 0.01 以内にしてみせて」と注文する。</li>
+    <li><strong>回答者</strong>が「x を a から <span class="m d">δ</span> = 0.002 以内に取れば大丈夫」と答える。</li>
+    <li>挑戦者が <span class="m e">ε</span> をどこまで小さくしても回答者が必ず <span class="m d">δ</span> を返せるなら、極限は L。</li>
+  </ol>
+  <p class="quote">順番が大事。<span class="e">ε が先</span>、<span class="d">δ が後</span>。δ は ε を見てから決めてよい。</p>
+</section>
+
+<section>
+  <div class="prose"><h2><span class="no">3</span>図で確かめる：<span class="m" style="font-size:1em">x² → 4（x → 2）</span></h2>
+  <p>緑の横帯が <span class="m e">L ± ε</span>、紫の縦帯が <span class="m d">a ± δ</span>。縦帯の中のグラフ（太線）がすべて横帯に収まれば成功です。</p></div>
+  <div class="fig">
+    <svg id="plot" viewBox="0 0 680 400" role="img" aria-label="y = x² のグラフに ε の横帯と δ の縦帯を重ねた図">
+      <rect id="hBand" x="60" width="580" fill="var(--eps)" opacity="0.16"/>
+      <rect id="vBand" y="20" height="350" fill="var(--del)" opacity="0.16"/>
+      <line id="h1" x1="60" x2="640" stroke="var(--eps)" stroke-dasharray="5 4"/>
+      <line id="h2" x1="60" x2="640" stroke="var(--eps)" stroke-dasharray="5 4"/>
+      <line id="v1" y1="20" y2="370" stroke="var(--del)" stroke-dasharray="5 4"/>
+      <line id="v2" y1="20" y2="370" stroke="var(--del)" stroke-dasharray="5 4"/>
+      <line id="lTarget" x1="60" x2="640" stroke="var(--muted)" stroke-width="0.8"/>
+      <line x1="60" y1="370" x2="640" y2="370" stroke="var(--muted)"/>
+      <line x1="60" y1="20" x2="60" y2="370" stroke="var(--muted)"/>
+      <path id="curve" fill="none" stroke="var(--ink)" stroke-width="1.5" opacity="0.45"/>
+      <path id="curveIn" fill="none" stroke-width="4" stroke-linecap="round"/>
+      <circle id="hole" r="5" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/>
+      <text id="tL" x="52" text-anchor="end" dominant-baseline="central">L</text>
+      <text id="ta" y="390" text-anchor="middle">a = 2</text>
+      <text x="630" y="388" text-anchor="end">x</text>
+      <text x="70" y="34">y = x²</text>
+    </svg>
+    <div class="ctl">
+      <label for="eps" style="color:var(--eps);font-weight:700">ε（縦の幅）</label><input type="range" id="eps" min="0.1" max="3" step="0.1" value="2"><output id="epsOut">2.0</output>
+      <label for="del" style="color:var(--del);font-weight:700">δ（横の幅）</label><input type="range" id="del" min="0.02" max="1.2" step="0.02" value="0.8"><output id="delOut">0.80</output>
+    </div>
+    <div class="row">
+      <label for="lSel" style="font-size:14.5px">目標の L</label>
+      <select id="lSel"><option value="4">L = 4（正しい極限）</option><option value="4.5">L = 4.5（まちがった値）</option></select>
+      <button id="auto" type="button">δ を自動で選ぶ</button>
+    </div>
+    <div class="row"><div id="status" role="status"></div></div>
+  </div>
+  <div class="prose" style="margin-top:16px">
+    <h3>おすすめの操作順</h3>
+    <ol class="steps">
+      <li>最初の状態（ε = 2.0, δ = 0.8）は<strong>失敗</strong>。x の範囲が広すぎてグラフがはみ出す。</li>
+      <li>δ を小さくすると、どこかで<strong>成功</strong>に変わる。</li>
+      <li>ε を 0.5、0.1 と厳しくすると、また失敗する。</li>
+      <li>「δ を自動で選ぶ」を押すと、もっと小さい δ でまた成功できる。<br>→ <strong>どんな ε にも δ で応えられる</strong> ＝ 極限は 4。</li>
+      <li>目標を L = 4.5 にして ε を 0.5 未満にすると、<strong>どんな δ でも成功しない</strong>。これが「極限は 4.5 ではない」ということ。</li>
+    </ol>
+    <p>白丸の点 <span class="m">(2, 4)</span> そのものは判定に使いません。定義の <span class="m">0 &lt; |x − a|</span> は「x = a は除く」という意味で、f(a) が定義されていなくても極限は考えられます。</p>
+  </div>
+</section>
+
+<section class="prose">
+  <h2><span class="no">4</span>証明の書き方（例題）</h2>
+  <p><span class="m">lim<sub>x→2</sub> (3x + 1) = 7</span> を示す。</p>
+  <div class="proof">
+    <div class="tag">下書き：結論から逆算して δ を探す</div>
+    <p>|f(x) − 7| = |3x − 6| = 3|x − 2|。これを <span class="m e">ε</span> 未満にしたいので、|x − 2| &lt; <span class="m e">ε</span>/3 であればよい。</p>
+    <div class="tag">清書：δ を先に宣言する</div>
+    <p style="margin:0">任意の <span class="m e">ε</span> &gt; 0 に対し <span class="m d">δ = ε/3</span> とおく。0 &lt; |x − 2| &lt; <span class="m d">δ</span> ならば<br>|(3x + 1) − 7| = 3|x − 2| &lt; 3<span class="m d">δ</span> = <span class="m e">ε</span>。　∎</p>
+  </div>
+  <h3>曲線のとき：x² → 4</h3>
+  <p>|x² − 4| = |x − 2|·|x + 2|。|x + 2| が残るので、まず <span class="m d">δ ≤ 1</span> と決めておく。すると 1 &lt; x &lt; 3 なので |x + 2| &lt; 5、よって |x² − 4| &lt; 5|x − 2|。<br>したがって <span class="m d">δ = min(1, ε/5)</span> とすればよい。</p>
+</section>
+
+<section class="prose">
+  <h2><span class="no">5</span>よくあるまちがい</h2>
+  <div class="pit">
+    <div><b>ε と δ の順番を逆にする</b><br>「ある δ に対してすべての ε で…」では別の意味（しかも、ほぼ成り立たない主張）になる。</div>
+    <div><b>x = a での値を見てしまう</b><br>極限は「a のまわり」の話。f(a) の値も、定義されているかどうかも関係ない。</div>
+    <div><b>いちばん大きい δ を探そうとする</b><br>δ は 1 つ見つかれば十分。小さめに取って構わない。</div>
+  </div>
+</section>
+
+<section class="prose">
+  <h2><span class="no">6</span>練習問題</h2>
+  <details><summary>問 1　lim<sub>x→1</sub> (2x − 5) = −3 を ε-δ で示せ。</summary>
+    <div class="ans">|(2x − 5) − (−3)| = 2|x − 1|。δ = ε/2 とおけば、0 &lt; |x − 1| &lt; δ のとき 2|x − 1| &lt; 2δ = ε。</div></details>
+  <details><summary>問 2　lim<sub>x→3</sub> x² = 9 を示せ。</summary>
+    <div class="ans">|x² − 9| = |x − 3|·|x + 3|。δ ≤ 1 なら 2 &lt; x &lt; 4 で |x + 3| &lt; 7。δ = min(1, ε/7) とおけば |x² − 9| &lt; 7δ ≤ ε。</div></details>
+  <details><summary>問 3　上の図で L = 4.5 のとき、ε = 0.3 に対して成功する δ がないのはなぜか。</summary>
+    <div class="ans">x を 2 に近づけると x² は 4 に近づくので、どんな小さい δ を取っても縦帯の中には x² ≒ 4 の点がある。|4 − 4.5| = 0.5 &gt; 0.3 なので、その点は横帯（4.2〜4.8）に入らない。</div></details>
+</section>
+
+<section class="prose">
+  <h2><span class="no">7</span>何の役に立つのか</h2>
+  <h3>「当たり前」を証明できるようにする</h3>
+  <p>微分の定義 f′(a) = lim (f(a+h) − f(a))/h の lim は ε-δ そのもの。中間値の定理（連続なら途中の値を必ず通る＝二分法の根拠）や、積分の定義もこの上に立っています。</p>
+  <h3>直感が外れる場面を見分ける</h3>
+  <p>xⁿ（0 ≤ x ≤ 1）は n → ∞ で x = 1 だけ値が飛ぶ。フーリエ級数の角に残る約 9 % のはみ出し（ギブス現象）。極限と積分の順番を入れ替えてよいか。こうした判断は ε-δ（ε-N）の言葉でしかできません。</p>
+  <h3>工学の「許容誤差」と同じ形</h3>
+  <div class="roles">
+    <div class="role eps"><b>ε ＝ 出力の許容誤差</b><span>「位置決め誤差を 1 nm 以内に」</span></div>
+    <div class="role del"><b>δ ＝ 入力をどこまで抑えるか</b><span>「では DAC の誤差を ○ mV 以内に」</span></div>
+  </div>
+  <p style="margin-top:12px">どんな ε にも δ がある（＝連続）なら、入力側を良くすれば必ず精度は出せる。δ が見つからないなら、出力が飛んでいる（不連続・飽和・ヒステリシス）。制御の安定性（リアプノフ安定）の定義も、この ε-δ の形をしています。</p>
+</section>
+
+<footer class="prose">数列の ε-N論法も同じ考え方です：「どんな ε にも、ある番号 N から先はすべて誤差 ε 以内」。</footer>
+</main>
+
+<script>
+(function(){
+  const X0=0.5,X1=3.5,Y0=0,Y1=10,a=2;
+  const sx=x=>60+(x-X0)/(X1-X0)*580, sy=y=>370-(y-Y0)/(Y1-Y0)*350, f=x=>x*x;
+  const $=id=>document.getElementById(id);
+  let p="";for(let i=0;i<=240;i++){const x=X0+(X1-X0)*i/240,y=f(x);if(y<=Y1)p+=(p?"L":"M")+sx(x).toFixed(1)+" "+sy(y).toFixed(1);}
+  $("curve").setAttribute("d",p);
+  $("hole").setAttribute("cx",sx(a));$("hole").setAttribute("cy",sy(4));
+  $("ta").setAttribute("x",sx(a));
+  const ok=(e,d,L)=>Math.abs(f(a+d)-L)<e&&Math.abs(f(a-d)-L)<e;
+  function draw(){
+    const e=+$("eps").value,d=+$("del").value,L=+$("lSel").value;
+    $("epsOut").textContent=e.toFixed(1);$("delOut").textContent=d.toFixed(2);
+    const yt=sy(L+e),yb=sy(L-e);
+    $("hBand").setAttribute("y",yt);$("hBand").setAttribute("height",yb-yt);
+    for(const [id,y] of [["h1",yt],["h2",yb],["lTarget",sy(L)]]){$(id).setAttribute("y1",y);$(id).setAttribute("y2",y);}
+    $("tL").setAttribute("y",sy(L));$("tL").textContent="L = "+L;
+    const xl=sx(a-d),xr=sx(a+d);
+    $("vBand").setAttribute("x",xl);$("vBand").setAttribute("width",xr-xl);
+    for(const [id,x] of [["v1",xl],["v2",xr]]){$(id).setAttribute("x1",x);$(id).setAttribute("x2",x);}
+    let q="";for(let i=0;i<=80;i++){const x=a-d+2*d*i/80;q+=(q?"L":"M")+sx(x).toFixed(1)+" "+sy(f(x)).toFixed(1);}
+    const good=ok(e,d,L),c=$("curveIn"),s=$("status");
+    c.setAttribute("d",q);c.setAttribute("stroke",good?"var(--ok)":"var(--ng)");
+    s.className=good?"ok":"ng";
+    s.textContent=good?"成功：δ の帯の中のグラフは、すべて ε の帯に入っています。"
+                      :"失敗：グラフが ε の帯からはみ出しています。δ を小さくしてみましょう。";
+  }
+  $("auto").addEventListener("click",()=>{
+    const e=+$("eps").value,L=+$("lSel").value;
+    for(let d=1.2;d>=0.0199;d-=0.02){if(ok(e,d,L)){$("del").value=d.toFixed(2);draw();return;}}
+    $("del").value="0.02";draw();
+    $("status").textContent="どんなに小さい δ でも成功しません。この L は極限ではありません。";
+  });
+  ["eps","del","lSel"].forEach(id=>$(id).addEventListener("input",draw));
+  draw();
+})();
+</script>
+</body>
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});}
+</script>
+</html>
